@@ -13,7 +13,7 @@ while True:
   key, value = line.split(' -> ')
   pair_insertion[key] = value
 
-steps = 40
+steps = 10
 print(f"Template:     {polymer_template}")
 for step in range(1, steps + 1):
   start_time = datetime.datetime.now()
