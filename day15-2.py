@@ -1,5 +1,5 @@
 import math
-filename = 'input15.txt'
+filename = 'input15-test.txt'
 f = open(filename)
 risk_level_map = []
 visited = []
