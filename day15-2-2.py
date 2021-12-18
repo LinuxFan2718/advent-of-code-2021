@@ -4,7 +4,6 @@ filename = 'input15.txt'
 f = open(filename)
 risk_level_map = []
 
-
 while True:
   line = f.readline().strip()
   if line == '':
@@ -40,12 +39,7 @@ destination_y = len(risk_level_map[0]) - 1
 runs = 0
 start_time = datetime.datetime.now()
 
-unexplored_vertices = []
-for i in range(len(dist)):
-  for j in range(len(dist[0])):
-    if not visited[i][j]:
-      unexplored_vertices.append([i, j])
-
+unexplored_vertices = [[0,0]]
 while not visited[destination_x][destination_y]:
   runs += 1
   if runs % 500 == 0:
@@ -53,18 +47,7 @@ while not visited[destination_x][destination_y]:
     visited_amount = len([visited_already for visited_already in lst if visited_already]) / len(lst)
     print(f"After runs {runs}: visited {visited_amount} in {datetime.datetime.now() - start_time}")
 
-  least_valued_unexplored_vertex = unexplored_vertices[0]
-  visited_vertex_i = 0
-  for i in range(1, len(unexplored_vertices)): # find least valued
-    cx, cy = unexplored_vertices[i]
-    lx, ly = least_valued_unexplored_vertex
-    if dist[cx][cy] < dist[lx][ly]:
-      least_valued_unexplored_vertex = unexplored_vertices[i]
-      visited_vertex_i = i
-  del unexplored_vertices[visited_vertex_i]
-  v = least_valued_unexplored_vertex
-  vx, vy = v
-
+  vx, vy = unexplored_vertices.pop() 
   visited[vx][vy] = True
   moves = []
   if vx > 0 and visited[vx-1][vy] == False: #up
@@ -79,6 +62,9 @@ while not visited[destination_x][destination_y]:
     mx, my = move
     if dist[vx][vy] + risk_level_map[mx][my] < dist[mx][my]:
       dist[mx][my] = dist[vx][vy] + risk_level_map[mx][my]
+      unexplored_vertices.append([mx, my])
+      # sort unexplored vertices by dist[v]
+      unexplored_vertices.sort(key= lambda v: -dist[v[0]][v[1]])
       prev[mx][my] = [vx, vy]
 
 print(f"lowest total risk = {dist[destination_x][destination_y]}")
