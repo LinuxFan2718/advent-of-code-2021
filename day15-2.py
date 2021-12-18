@@ -1,6 +1,6 @@
 import math
 import datetime
-filename = 'input15.txt'
+filename = 'input15-test.txt'
 f = open(filename)
 risk_level_map = []
 
@@ -39,24 +39,29 @@ destination_x = len(risk_level_map) - 1
 destination_y = len(risk_level_map[0]) - 1
 runs = 0
 start_time = datetime.datetime.now()
+
+unexplored_vertices = []
+for i in range(len(dist)):
+  for j in range(len(dist[0])):
+    if not visited[i][j]:
+      unexplored_vertices.append([i, j])
+
 while not visited[destination_x][destination_y]:
   runs += 1
-  if runs % 100 == 0:
+  if runs % 500 == 0:
     lst = [x for l in visited for x in l]
     visited_amount = len([visited_already for visited_already in lst if visited_already]) / len(lst)
     print(f"After runs {runs}: visited {visited_amount} in {datetime.datetime.now() - start_time}")
 
-  unexplored_vertices = []
-  for i in range(len(dist)):
-    for j in range(len(dist[0])):
-      if not visited[i][j]:
-        unexplored_vertices.append([i, j])
   least_valued_unexplored_vertex = unexplored_vertices[0]
+  visited_vertex_i = 0
   for i in range(1, len(unexplored_vertices)): # find least valued
     cx, cy = unexplored_vertices[i]
     lx, ly = least_valued_unexplored_vertex
     if dist[cx][cy] < dist[lx][ly]:
       least_valued_unexplored_vertex = unexplored_vertices[i]
+      visited_vertex_i = i
+  del unexplored_vertices[visited_vertex_i]
   v = least_valued_unexplored_vertex
   vx, vy = v
 
