@@ -1,10 +1,13 @@
 import math
 version_number_sum = 0
 
-def parse(packets, leftpad=True):
+def parse(packets, leftpad=True, explicit_left_pad=None):
   global version_number_sum
   num_binary_digits = int(math.log(packets, 2)) + 1
-  if leftpad and num_binary_digits % 4 != 0:
+
+  if explicit_left_pad != None:
+    leftpad_size = explicit_left_pad
+  elif leftpad and num_binary_digits % 4 != 0:
     leftpad_size = 4 - (num_binary_digits % 4)
   else:
     leftpad_size = 0
@@ -28,25 +31,24 @@ def parse(packets, leftpad=True):
     bitmask = 2**position - 1
     number_data = packets & bitmask
     single_digit = False
-    if int(math.log(bitmask, 2)) != int(math.log(number_data, 2)):
-      single_digit = True
-    position = parse_value_packet(number_data, last_group=single_digit)
+    left_pad = int(math.log(bitmask, 2)) - int(math.log(number_data, 2))
+
+    position = parse_value_packet(number_data, explicit_left_pad = left_pad)
+    if position > 0:
+      bitmask = 2**position - 1
+      remaining_packets = packets & bitmask
+      if remaining_packets > 0:
+        left_pad = int(math.log(bitmask, 2)) - int(math.log(remaining_packets, 2))
+        parse(remaining_packets, explicit_left_pad=left_pad)
   else: # operator packet
-    position = parse_operator_packet(packets)
+    parse_operator_packet(packets)
 
-  if position > 0:
-    bitmask = 2**position - 1
-    remaining_packets = packets & bitmask
-    if remaining_packets > 0:
-      parse(remaining_packets)
-
-def parse_value_packet(packet, last_group=False): # dropped version and id from argument
+def parse_value_packet(packet, explicit_left_pad=0): # dropped version and id from argument
   num_binary_digits = int(math.log(packet, 2)) + 1
-  if last_group:
-    position = num_binary_digits - 4
-  else:
-    position = num_binary_digits - 5
+
+  position = num_binary_digits - 5 + explicit_left_pad
   total_value = 0
+  last_group = False
   while True:
     bitmask = 0b11111 << position
     literal = (packet & bitmask) >> position
@@ -61,8 +63,8 @@ def parse_value_packet(packet, last_group=False): # dropped version and id from 
     if last_group:
       break
   print(f"value parsed from packet = {total_value}")
-  bits_to_ignore = position % 4
-  position -= bits_to_ignore
+  # bits_to_ignore = position % 4
+  # position -= bits_to_ignore
   return position
 
 def parse_operator_packet(packet):
@@ -95,19 +97,23 @@ def parse_operator_packet(packet):
 
   elif length_type_id == 1:
     print(f"number of sub-packets = {bits_labeled_L}")
-  pass
-  return position
+    bitmask = 2**position - 1
+    raw_bits_subpackets = packet & bitmask
+    explicit_left_pad = int(math.log(bitmask,2)) - int(math.log(raw_bits_subpackets,2))
+    parse(raw_bits_subpackets, explicit_left_pad=explicit_left_pad)
+  
 
 
 filename = 'input15.txt'
 f = open(filename)
 #string_data = f.readline().strip()
-string_data = 'D2FE28' # literal value
+#string_data = 'D2FE28' # literal value
+#string_data = 'D2FE28D2FE28' # illegal, each transmission is a single packet
 
 # operator packet examples
 #string_data = '38006F45291200'
 #string_data = 'EE00D40C823060' 
-# string_data = '8A004A801A8002F478'
+string_data = '8A004A801A8002F478'
 # string_data = '620080001611562C8802118E34'
 # string_data = 'C0015000016115A2E0802F182340'
 # string_data = 'A0016C880162017C3686B18A3D4780'
