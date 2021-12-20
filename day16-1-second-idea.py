@@ -170,16 +170,22 @@ def parse_hex_packet(hex_packet):
 #hex_packet = 'C0015000016115A2E0802F182340'
 #hex_packet = 'A0016C880162017C3686B18A3D4780'
 all_hex_packets = [
-  'D2FE28',
-  '38006F45291200',
-  'EE00D40C823060',
-  '8A004A801A8002F478',
-  '620080001611562C8802118E34',
-  'C0015000016115A2E0802F182340',
+   'D2FE28',
+   '38006F45291200',
+   'EE00D40C823060',
+   '8A004A801A8002F478',
+   '620080001611562C8802118E34',
+   'C0015000016115A2E0802F182340',
   'A0016C880162017C3686B18A3D4780'
  ]
-#f = open('input16.txt')
-#hex_packet = f.readline()
+
 for hex_packet in all_hex_packets:
   parse_hex_packet(hex_packet)
-print(f"version sum = {version_sum}")
+print(f"version sum = {version_sum} (111 correct)")
+
+version_sum = 0
+f = open('input16.txt')
+hex_packet = f.readline()
+parse_hex_packet(hex_packet)
+
+print(f"version sum = {version_sum} (unknown)")
