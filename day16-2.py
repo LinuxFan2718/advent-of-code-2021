@@ -1,6 +1,22 @@
 import math
-DEBUG = True
-version_sum = 0
+DEBUG = False
+
+def parse_decoded_packet(packet_type_id, values):
+  if packet_type_id == 0:
+    return sum(values)
+  elif packet_type_id == 1:
+    return math.prod(values)
+  elif packet_type_id == 2:
+    return min(values)
+  elif packet_type_id == 3:
+    return max(values)
+  elif packet_type_id == 5:
+    return int(bool(values[0] > values[1]))
+  elif packet_type_id == 6:
+    return int(bool(values[0] < values[1]))
+  elif packet_type_id == 7:
+    return int(bool(values[0] == values[1]))
+
 
 # does not know what the operation is
 # return an array of values
@@ -11,7 +27,6 @@ def parse_raw_bits_with_length(raw_bits, total_length):
   local_position = total_length - 3
   version_bitmask = 0b111 << local_position
   version = (version_bitmask & raw_bits) >> local_position
-  version_sum += version
   local_position -= 3
   packet_type_bitmask = 0b111 << local_position
   packet_type = (packet_type_bitmask & raw_bits) >> local_position
@@ -50,15 +65,18 @@ def parse_raw_bits_with_length(raw_bits, total_length):
       local_position -= recursive_total_length
       raw_bits_bitmask = (2**recursive_total_length - 1) << local_position
       recursive_raw_bits = (raw_bits_bitmask & raw_bits) >> local_position
-      parse_raw_bits_with_length(recursive_raw_bits, recursive_total_length)
+      sub_values = parse_raw_bits_with_length(recursive_raw_bits, recursive_total_length)
     elif length_type == 1:
       local_position -= 11
       recursive_num_packets_bitmask = 0b11111111111 << local_position
       recursive_num_packets = (recursive_num_packets_bitmask & raw_bits) >> local_position
-      local_position = parse_raw_bits_with_num_packets(raw_bits, recursive_num_packets, local_position)
+      local_position, sub_values = parse_raw_bits_with_num_packets(raw_bits, recursive_num_packets, local_position)
+    parsed_value = parse_decoded_packet(packet_type, sub_values)
+    values.append(parsed_value)
   if local_position > 0:
     new_raw_bits = raw_bits & (2**local_position) - 1
-    parse_raw_bits_with_length(new_raw_bits, local_position)
+    sub_values_2 = parse_raw_bits_with_length(new_raw_bits, local_position)
+    values = values + sub_values_2
   return values
 
 def parse_raw_bits_with_num_packets(raw_packet, num_packets, position):
@@ -69,7 +87,6 @@ def parse_raw_bits_with_num_packets(raw_packet, num_packets, position):
     position -= 3
     version_bitmask = 0b111 << position
     version = (version_bitmask & raw_packet) >> position
-    version_sum += version
     position -= 3
     packet_type_bitmask = 0b111 << position
     packet_type = (packet_type_bitmask & raw_packet) >> position
@@ -113,7 +130,8 @@ def parse_raw_bits_with_num_packets(raw_packet, num_packets, position):
         if DEBUG:
           print(f"recursive num packets {recursive_num_packets}")
         position, sub_values = parse_raw_bits_with_num_packets(raw_packet, recursive_num_packets, position)
-
+      parsed_value = parse_decoded_packet(packet_type, sub_values)
+      values.append(parsed_value)
     packets_parsed += 1
   if DEBUG:
     print(f"packets parsed = {packets_parsed} position = {position}")
@@ -126,7 +144,6 @@ def parse_hex_packet(hex_packet):
 
   version_bitmask = 0b111 << num_bits - 3
   version = (version_bitmask & raw_packet) >> num_bits - 3
-  version_sum += version
   packet_type_bitmask = 0b111 << num_bits - 6
   packet_type = (packet_type_bitmask & raw_packet) >> num_bits - 6
 
@@ -164,6 +181,7 @@ def parse_hex_packet(hex_packet):
       position = num_bits - 18
       _position, values = parse_raw_bits_with_num_packets(raw_packet, num_packets, position)
     print(f"parsing packet type {packet_type} with values {values}")
+    return parse_decoded_packet(packet_type, values)
 
 all_hex_packets = [
   #  'D2FE28',
@@ -173,16 +191,23 @@ all_hex_packets = [
   #  '620080001611562C8802118E34',
   #  'C0015000016115A2E0802F182340',
   # 'A0016C880162017C3686B18A3D4780'
-  'C200B40A82'
+  'C200B40A82',
+  '04005AC33890',
+  '880086C3E88112',
+  'CE00C43D881120',
+  'D8005AC2A8F0',
+  'F600BC2D8F',
+  '9C005AC2F8F0',
+  '9C0141080250320F1802104A08'
  ]
 
 for hex_packet in all_hex_packets:
-  parse_hex_packet(hex_packet)
-print(f"version sum = {version_sum} (111 correct)")
+  res = parse_hex_packet(hex_packet)
+  print(f"result = {res}")
+  print()
 
-# version_sum = 0
-# f = open('input16.txt')
-# hex_packet = f.readline().strip()
-# parse_hex_packet(hex_packet)
-
-print(f"version sum = {version_sum} (unknown)")
+f = open('input16.txt')
+hex_packet = f.readline().strip()
+res = parse_hex_packet(hex_packet)
+print(f"result = {res}")
+print()
