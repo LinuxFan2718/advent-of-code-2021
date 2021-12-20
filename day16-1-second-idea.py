@@ -59,8 +59,6 @@ def parse_raw_bits_with_length(raw_bits, total_length):
     parse_raw_bits_with_length(new_raw_bits, local_position)
 
 def parse_raw_bits_with_num_packets(raw_packet, num_packets, position):
-  if DEBUG:
-    print(f"num packets {num_packets}")
   global version_sum
   packets_parsed = 0
   while packets_parsed < num_packets:
@@ -113,7 +111,7 @@ def parse_raw_bits_with_num_packets(raw_packet, num_packets, position):
 
     packets_parsed += 1
   if DEBUG:
-    print(f"packets parsed = {packets_parsed}")
+    print(f"packets parsed = {packets_parsed} position = {position}")
   return position
 
 # function param is string with hex representation of packet
@@ -170,22 +168,22 @@ def parse_hex_packet(hex_packet):
 #hex_packet = 'C0015000016115A2E0802F182340'
 #hex_packet = 'A0016C880162017C3686B18A3D4780'
 all_hex_packets = [
-   'D2FE28',
-   '38006F45291200',
-   'EE00D40C823060',
-   '8A004A801A8002F478',
-   '620080001611562C8802118E34',
-   'C0015000016115A2E0802F182340',
+  #  'D2FE28',
+  #  '38006F45291200',
+  #  'EE00D40C823060',
+  #  '8A004A801A8002F478',
+  #  '620080001611562C8802118E34',
+  #  'C0015000016115A2E0802F182340',
   'A0016C880162017C3686B18A3D4780'
  ]
 
-for hex_packet in all_hex_packets:
-  parse_hex_packet(hex_packet)
-print(f"version sum = {version_sum} (111 correct)")
+# for hex_packet in all_hex_packets:
+#   parse_hex_packet(hex_packet)
+# print(f"version sum = {version_sum} (111 correct)")
 
 version_sum = 0
 f = open('input16.txt')
-hex_packet = f.readline()
-#parse_hex_packet(hex_packet)
+hex_packet = f.readline().strip()
+parse_hex_packet(hex_packet)
 
 print(f"version sum = {version_sum} (unknown)")
