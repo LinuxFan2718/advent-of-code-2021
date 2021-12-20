@@ -5,7 +5,7 @@ version_sum = 0
 def parse_raw_bits_with_length(raw_bits, total_length):
   global version_sum
   if DEBUG:
-    print(f"total length = {total_length} raw bits = {raw_bits} {bin(raw_bits)}")
+    pass#print(f"total length = {total_length} raw bits = {raw_bits} {bin(raw_bits)}")
 
   position = total_length - 3
   version_bitmask = 0b111 << position
@@ -16,7 +16,7 @@ def parse_raw_bits_with_length(raw_bits, total_length):
   packet_type = (packet_type_bitmask & raw_bits) >> position
 
   if DEBUG:
-    print(f"embedded version = {version} packet type = {packet_type}")
+    print(f"(length) embedded version = {version} packet type = {packet_type}")
 
   if packet_type == 4: # literal value packet
     value = 0
@@ -36,11 +36,11 @@ def parse_raw_bits_with_length(raw_bits, total_length):
     if DEBUG:
       print(f"embedded (length) literal packet value = {value}")
   else:
-    if DEBUG:
-      print(f"embedded (length) operator packet detected")
     position -= 1
     length_type_bitmask = 0b1 << position
     length_type = (length_type_bitmask & raw_bits) >> position
+    if DEBUG:
+      print(f"embedded (length) operator packet of type {length_type}")
     if length_type == 0:
       position -= 15
       recursive_total_length_bitmask = 0b111111111111111 << position
@@ -58,10 +58,9 @@ def parse_raw_bits_with_length(raw_bits, total_length):
     new_raw_bits = raw_bits & (2**position) - 1
     parse_raw_bits_with_length(new_raw_bits, position)
 
-
-
-
 def parse_raw_bits_with_num_packets(raw_packet, num_packets, position):
+  if DEBUG:
+    print(f"num packets {num_packets}")
   global version_sum
   packets_parsed = 0
   while packets_parsed < num_packets:
@@ -91,12 +90,12 @@ def parse_raw_bits_with_num_packets(raw_packet, num_packets, position):
       if DEBUG:
         print(f"embedded (num packets) literal packet value = {value}")
     else:
-      if DEBUG:
-        print(f"embedded (num packets) operator packet detected")
       position -= 1
       length_type_bitmask = 0b1 << position
       length_type = (length_type_bitmask & raw_packet) >> position
-      if length_type == 0:
+      if DEBUG:
+        print(f"embedded (num packets) operator packet of type {length_type}")
+      if length_type == 0: # theory 2 maybe bug in here
         position -= 15
         total_length_bitmask = 0b111111111111111 << position
         total_length = (total_length_bitmask & raw_packet) >> position
@@ -104,10 +103,12 @@ def parse_raw_bits_with_num_packets(raw_packet, num_packets, position):
         raw_bits_bitmask = (2**total_length - 1) << position
         raw_bits = (raw_bits_bitmask & raw_packet) >> position
         parse_raw_bits_with_length(raw_bits, total_length)
-      elif length_type == 1:
+      elif length_type == 1: # theory 1 bug in finding num packets embedded here
         position -= 11
         recursive_num_packets_bitmask = 0b11111111111 << position
         recursive_num_packets = (recursive_num_packets_bitmask & raw_packet) >> position
+        if DEBUG:
+          print(f"recursive num packets {recursive_num_packets}")
         position = parse_raw_bits_with_num_packets(raw_packet, recursive_num_packets, position)
 
     packets_parsed += 1
@@ -161,14 +162,24 @@ def parse_hex_packet(hex_packet):
       position = num_bits - 18
       parse_raw_bits_with_num_packets(raw_packet, num_packets, position)
 
-#hex_packet = 'D2FE28' # literal value 2021
+#hex_packet = 'D2FE28'
 #hex_packet = '38006F45291200'
 #hex_packet = 'EE00D40C823060'
-#hex_packet = '8A004A801A8002F478' # correct
-#hex_packet =  '620080001611562C8802118E34' # correct
-#hex_packet = 'C0015000016115A2E0802F182340' # too large
-#hex_packet = 'A0016C880162017C3686B18A3D4780' # too large
-f = open('input16.txt')
-hex_packet = f.readline()
-parse_hex_packet(hex_packet)
+#hex_packet = '8A004A801A8002F478'
+#hex_packet =  '620080001611562C8802118E34'
+#hex_packet = 'C0015000016115A2E0802F182340'
+#hex_packet = 'A0016C880162017C3686B18A3D4780'
+all_hex_packets = [
+  'D2FE28',
+  '38006F45291200',
+  'EE00D40C823060',
+  '8A004A801A8002F478',
+  '620080001611562C8802118E34',
+  'C0015000016115A2E0802F182340',
+  'A0016C880162017C3686B18A3D4780'
+ ]
+#f = open('input16.txt')
+#hex_packet = f.readline()
+for hex_packet in all_hex_packets:
+  parse_hex_packet(hex_packet)
 print(f"version sum = {version_sum}")
