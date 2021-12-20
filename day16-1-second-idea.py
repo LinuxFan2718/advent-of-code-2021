@@ -7,13 +7,13 @@ def parse_raw_bits_with_length(raw_bits, total_length):
   if DEBUG:
     pass#print(f"total length = {total_length} raw bits = {raw_bits} {bin(raw_bits)}")
 
-  position = total_length - 3
-  version_bitmask = 0b111 << position
-  version = (version_bitmask & raw_bits) >> position
+  local_position = total_length - 3
+  version_bitmask = 0b111 << local_position
+  version = (version_bitmask & raw_bits) >> local_position
   version_sum += version
-  position -= 3
-  packet_type_bitmask = 0b111 << position
-  packet_type = (packet_type_bitmask & raw_bits) >> position
+  local_position -= 3
+  packet_type_bitmask = 0b111 << local_position
+  packet_type = (packet_type_bitmask & raw_bits) >> local_position
 
   if DEBUG:
     print(f"(length) embedded version = {version} packet type = {packet_type}")
@@ -23,40 +23,40 @@ def parse_raw_bits_with_length(raw_bits, total_length):
     this_digit_last = False
 
     while not this_digit_last:
-      position -= 1
-      this_digit_last_bitmask = 0b1 << position
-      this_digit_last_bit = (this_digit_last_bitmask & raw_bits) >> position
+      local_position -= 1
+      this_digit_last_bitmask = 0b1 << local_position
+      this_digit_last_bit = (this_digit_last_bitmask & raw_bits) >> local_position
       this_digit_last = not bool(this_digit_last_bit)
 
-      position -= 4
-      this_digit_bitmask = 0b1111 << position
-      this_digit = (this_digit_bitmask & raw_bits) >> position
+      local_position -= 4
+      this_digit_bitmask = 0b1111 << local_position
+      this_digit = (this_digit_bitmask & raw_bits) >> local_position
       value <<= 4
       value += this_digit
     if DEBUG:
       print(f"embedded (length) literal packet value = {value}")
   else:
-    position -= 1
-    length_type_bitmask = 0b1 << position
-    length_type = (length_type_bitmask & raw_bits) >> position
+    local_position -= 1
+    length_type_bitmask = 0b1 << local_position
+    length_type = (length_type_bitmask & raw_bits) >> local_position
     if DEBUG:
       print(f"embedded (length) operator packet of type {length_type}")
     if length_type == 0:
-      position -= 15
-      recursive_total_length_bitmask = 0b111111111111111 << position
-      recursive_total_length = (recursive_total_length_bitmask & raw_bits) >> position
-      position -= recursive_total_length
-      raw_bits_bitmask = (2**recursive_total_length - 1) << position
-      recursive_raw_bits = (raw_bits_bitmask & raw_bits) >> position
+      local_position -= 15
+      recursive_total_length_bitmask = 0b111111111111111 << local_position
+      recursive_total_length = (recursive_total_length_bitmask & raw_bits) >> local_position
+      local_position -= recursive_total_length
+      raw_bits_bitmask = (2**recursive_total_length - 1) << local_position
+      recursive_raw_bits = (raw_bits_bitmask & raw_bits) >> local_position
       parse_raw_bits_with_length(recursive_raw_bits, recursive_total_length)
     elif length_type == 1:
-      position -= 11
-      recursive_num_packets_bitmask = 0b11111111111 << position
-      recursive_num_packets = (recursive_num_packets_bitmask & raw_bits) >> position
-      position = parse_raw_bits_with_num_packets(raw_bits, recursive_num_packets, position)
-  if position > 0:
-    new_raw_bits = raw_bits & (2**position) - 1
-    parse_raw_bits_with_length(new_raw_bits, position)
+      local_position -= 11
+      recursive_num_packets_bitmask = 0b11111111111 << local_position
+      recursive_num_packets = (recursive_num_packets_bitmask & raw_bits) >> local_position
+      local_position = parse_raw_bits_with_num_packets(raw_bits, recursive_num_packets, local_position)
+  if local_position > 0:
+    new_raw_bits = raw_bits & (2**local_position) - 1
+    parse_raw_bits_with_length(new_raw_bits, local_position)
 
 def parse_raw_bits_with_num_packets(raw_packet, num_packets, position):
   if DEBUG:
@@ -95,7 +95,7 @@ def parse_raw_bits_with_num_packets(raw_packet, num_packets, position):
       length_type = (length_type_bitmask & raw_packet) >> position
       if DEBUG:
         print(f"embedded (num packets) operator packet of type {length_type}")
-      if length_type == 0: # theory 2 maybe bug in here
+      if length_type == 0:
         position -= 15
         total_length_bitmask = 0b111111111111111 << position
         total_length = (total_length_bitmask & raw_packet) >> position
@@ -103,7 +103,7 @@ def parse_raw_bits_with_num_packets(raw_packet, num_packets, position):
         raw_bits_bitmask = (2**total_length - 1) << position
         raw_bits = (raw_bits_bitmask & raw_packet) >> position
         parse_raw_bits_with_length(raw_bits, total_length)
-      elif length_type == 1: # theory 1 bug in finding num packets embedded here
+      elif length_type == 1:
         position -= 11
         recursive_num_packets_bitmask = 0b11111111111 << position
         recursive_num_packets = (recursive_num_packets_bitmask & raw_packet) >> position
@@ -186,6 +186,6 @@ print(f"version sum = {version_sum} (111 correct)")
 version_sum = 0
 f = open('input16.txt')
 hex_packet = f.readline()
-parse_hex_packet(hex_packet)
+#parse_hex_packet(hex_packet)
 
 print(f"version sum = {version_sum} (unknown)")
