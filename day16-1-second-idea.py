@@ -53,7 +53,7 @@ def parse_raw_bits_with_length(raw_bits, total_length):
       position -= 11
       recursive_num_packets_bitmask = 0b11111111111 << position
       recursive_num_packets = (recursive_num_packets_bitmask & raw_bits) >> position
-      parse_raw_bits_with_num_packets(raw_bits, recursive_num_packets, position)
+      position = parse_raw_bits_with_num_packets(raw_bits, recursive_num_packets, position)
   if position > 0:
     new_raw_bits = raw_bits & (2**position) - 1
     parse_raw_bits_with_length(new_raw_bits, position)
@@ -108,11 +108,12 @@ def parse_raw_bits_with_num_packets(raw_packet, num_packets, position):
         position -= 11
         recursive_num_packets_bitmask = 0b11111111111 << position
         recursive_num_packets = (recursive_num_packets_bitmask & raw_packet) >> position
-        parse_raw_bits_with_num_packets(raw_packet, recursive_num_packets, position)
+        position = parse_raw_bits_with_num_packets(raw_packet, recursive_num_packets, position)
 
     packets_parsed += 1
   if DEBUG:
     print(f"packets parsed = {packets_parsed}")
+  return position
 
 # function param is string with hex representation of packet
 # use this to determine left pad (maybe right pad later)
@@ -167,5 +168,7 @@ def parse_hex_packet(hex_packet):
 #hex_packet =  '620080001611562C8802118E34' # correct
 #hex_packet = 'C0015000016115A2E0802F182340' # too large
 #hex_packet = 'A0016C880162017C3686B18A3D4780' # too large
+f = open('input16.txt')
+hex_packet = f.readline()
 parse_hex_packet(hex_packet)
 print(f"version sum = {version_sum}")
