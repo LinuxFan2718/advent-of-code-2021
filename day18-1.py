@@ -11,7 +11,8 @@ def list_numbers_in_order(l, current_i=[]):
 def explode(smallfish_number):
   idx = list_numbers_in_order(smallfish_number)
   x = -1
-  while True:
+  stop = False
+  while not stop and x + 1 < len(idx):
     x += 1
     if len(idx[x]) == 5:
       i, j, k, m = idx[x][0], idx[x][1], idx[x][2], idx[x][3]
@@ -37,9 +38,40 @@ def explode(smallfish_number):
           smallfish_number[right_i[0]][right_i[1]][right_i[2]] += right
         elif len(right_i) == 4:
           smallfish_number[right_i[0]][right_i[1]][right_i[2]][right_i[3]] += right
-      break
+      stop = True
+  return stop
 
 def split(smallfish_number):
+  idx = list_numbers_in_order(smallfish_number)
+  x = -1
+  stop = False
+  while not stop and x + 1 < len(idx):
+    x += 1
+    val = None
+    if len(idx[x]) == 1:
+      val = smallfish_number[idx[x][0]]
+    elif len(idx[x]) == 2:
+      val = smallfish_number[idx[x][0]][idx[x][1]]
+    elif len(idx[x]) == 3:
+      val = smallfish_number[idx[x][0]][idx[x][1]][idx[x][2]]
+    elif len(idx[x]) == 4:
+      val = smallfish_number[idx[x][0]][idx[x][1]][idx[x][2]][idx[x][3]]
+    if val >= 10:
+      stop = True
+      left = val // 2
+      right = val // 2 if val % 2 == 0 else 1 + (val // 2)
+      newpair = [left, right]
+      if len(idx[x]) == 1:
+        smallfish_number[idx[x][0]] = newpair
+      elif len(idx[x]) == 2:
+        smallfish_number[idx[x][0]][idx[x][1]] = newpair
+      elif len(idx[x]) == 3:
+        smallfish_number[idx[x][0]][idx[x][1]][idx[x][2]] = newpair
+      elif len(idx[x]) == 4:
+        smallfish_number[idx[x][0]][idx[x][1]][idx[x][2]][idx[x][3]] = newpair
+  return stop
+
+def old_split(smallfish_number):
   stop = False
 
   for i in range(len(smallfish_number)):
@@ -142,11 +174,11 @@ def reduce(smallfish_number):
 #   print()
 #   pass
 
-l1 = [[[[4, 0], [5, 4]], [[7, 7], [6, 0]]], [[8, [7, 7]], [[7, 9], [5, 0]]]]
-l2 = [[2, [[0, 8], [3, 4]]], [[[6, 7], 1], [7, [1, 6]]]]
-l3 = addition(l1, l2)
-reduce(l3)
-print(f"{l3}")
+# l1 = [[[[4, 0], [5, 4]], [[7, 7], [6, 0]]], [[8, [7, 7]], [[7, 9], [5, 0]]]]
+# l2 = [[2, [[0, 8], [3, 4]]], [[[6, 7], 1], [7, [1, 6]]]]
+# l3 = addition(l1, l2)
+# reduce(l3)
+# print(f"{l3}")
 
 # print(f"{running_sum == [[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]}")
 # print(f"{running_sum}")
