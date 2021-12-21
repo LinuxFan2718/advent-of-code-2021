@@ -176,19 +176,37 @@ def reduce(smallfish_number):
 #     break
 #   snailfish_numbers.append(eval(line))
 snailfish_numbers = [
-  [1,1],
-  [2,2],
-  [3,3],
-  [4,4],
-  [5,5]
+  [[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],
+  [7,[[[3,7],[4,3]],[[6,3],[8,8]]]],
+  [[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]],
+  [[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]],
+  [7,[5,[[3,8],[1,4]]]],
+  [[2,[2,2]],[8,[8,1]]],
+  [2,9],
+  [1,[[[9,3],9],[[9,0],[0,7]]]],
+  [[[5,[7,4]],7],1],
+  [[[[4,2],2],6],[8,7]]
 ]
 
-running_sum = snailfish_numbers[0]
-for x in range(1, len(snailfish_numbers)):
-  running_sum = addition(running_sum, snailfish_numbers[x])
-  reduce(running_sum)
+# running_sum = snailfish_numbers[0]
+# for x in range(1, len(snailfish_numbers)):
+#   print(f"  {running_sum}")
+#   print(f"+ {snailfish_numbers[x]}")
+#   running_sum = addition(running_sum[:], snailfish_numbers[x])
+#   reduce(running_sum)
+#   print(f"= {running_sum}")
+#   print()
+#   pass
 
-print(f"{running_sum}")
+l1 = [[[[4, 0], [5, 4]], [[7, 7], [6, 0]]], [[8, [7, 7]], [[7, 9], [5, 0]]]]
+l2 = [[2, [[0, 8], [3, 4]]], [[[6, 7], 1], [7, [1, 6]]]]
+l3 = addition(l1, l2)
+reduce(l3)
+print(f"{l3}")
+
+# print(f"{running_sum == [[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]}")
+# print(f"{running_sum}")
+# print(f"{[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]}")
 
 # res = magnitude([9,1])
 # print(f"{res == 29} {res} == {29}")
