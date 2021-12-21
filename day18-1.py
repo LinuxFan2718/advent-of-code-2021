@@ -60,7 +60,7 @@ def explode(smallfish_number):
                   nested_in_four = temp
 
   if nested_in_four == None:
-    return None
+    return False
 
   # if there is one extract its values and change it to a 0 int
   i, j, k, m = nested_in_four['i'], nested_in_four['j'], nested_in_four['k'], nested_in_four['m']
@@ -96,12 +96,63 @@ def explode(smallfish_number):
       smallfish_number[i] += right
   return True
 
+def split(smallfish_number):
+  stop = False
+
+  for i in range(len(smallfish_number)):
+    if not stop and isinstance(smallfish_number[i], int):
+      if smallfish_number[i] >= 10:
+        stop = True
+        if smallfish_number[i] % 2 == 0:
+          newpair = [smallfish_number[i] // 2, smallfish_number[i] // 2]
+        else:
+          newpair = [smallfish_number[i] // 2, 1 + smallfish_number[i] // 2]
+        smallfish_number[i] = newpair
+        break
+    elif not stop and isinstance(smallfish_number[i], list):
+      for j in range(len(smallfish_number[i])):
+        if not stop and isinstance(smallfish_number[i][j], int):
+          if smallfish_number[i][j] >= 10:
+            stop = True
+            if smallfish_number[i][j] % 2 == 0:
+              newpair = [smallfish_number[i][j] // 2, smallfish_number[i][j] // 2]
+            else:
+              newpair = [smallfish_number[i][j] // 2, 1 + smallfish_number[i][j] // 2]
+            smallfish_number[i][j] = newpair
+            break 
+        elif not stop and isinstance(smallfish_number[i][j], list):
+          for k in range(len(smallfish_number[i][j])):
+            if not stop and isinstance(smallfish_number[i][j][k], int):
+              if smallfish_number[i][j][k] >= 10:
+                stop = True
+                if smallfish_number[i][j][k] % 2 == 0:
+                  newpair = [smallfish_number[i][j][k] // 2, smallfish_number[i][j][k] // 2]
+                else:
+                  newpair = [smallfish_number[i][j][k] // 2, 1 + smallfish_number[i][j][k] // 2]
+                smallfish_number[i][j][k] = newpair
+                break
+            elif not stop and isinstance(smallfish_number[i][j][k], list):
+              for m in range(len(smallfish_number[i][j][k])):
+                element = smallfish_number[i][j][k][m]
+                if not stop and isinstance(element, int):
+                  if element >= 10:
+                    stop = True
+                    if element % 2 == 0:
+                      newpair = [element // 2, element // 2]
+                    else:
+                      newpair = [element // 2, 1 + element // 2]
+                    smallfish_number[i][j][k][m] = newpair
+                    break
+                  
+                if isinstance(element, list):
+                  print(f"should not happen {element} is a list {i} {j} {k} {m}")
+  return stop
+
+
 
 def magnitude(smallfish_number):
   return None
 
-def split(smallfish_number):
-  return None
 
 def addition(smallfish_number1, smallfish_number2):
   ans = [smallfish_number1, smallfish_number2]
@@ -131,3 +182,11 @@ print(f"{smallfish_number == [[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]}")
 smallfish_number = [[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]
 explode(smallfish_number)
 print(f"{smallfish_number == [[3,[2,[8,0]]],[9,[5,[7,0]]]]}")
+
+smallfish_number = [[[[0,7],4],[15,[0,13]]],[1,1]]
+split(smallfish_number)
+print(f"{smallfish_number == [[[[0,7],4],[[7,8],[0,13]]],[1,1]]} {smallfish_number} == {[[[[0,7],4],[[7,8],[0,13]]],[1,1]]}")
+
+smallfish_number = [[[[0,7],4],[[7,8],[0,13]]],[1,1]]
+split(smallfish_number)
+print(f"{smallfish_number == [[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]} {smallfish_number} == {[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]}")
