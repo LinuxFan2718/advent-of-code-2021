@@ -148,11 +148,11 @@ def split(smallfish_number):
                   print(f"should not happen {element} is a list {i} {j} {k} {m}")
   return stop
 
-
-
 def magnitude(smallfish_number):
-  return None
-
+  if isinstance(smallfish_number, int):
+    return smallfish_number
+  elif isinstance(smallfish_number, list):
+    return 3 * magnitude(smallfish_number[0]) + 2 * magnitude(smallfish_number[1])
 
 def addition(smallfish_number1, smallfish_number2):
   ans = [smallfish_number1, smallfish_number2]
@@ -160,33 +160,52 @@ def addition(smallfish_number1, smallfish_number2):
   return ans
   
 def reduce(smallfish_number):
+  did_split = False
+  did_explode = explode(smallfish_number)
+  if not did_explode:
+    did_split = split(smallfish_number)
+  if did_explode or did_split:
+    reduce(smallfish_number)
   return None
 
-smallfish_number = [[[[[9,8],1],2],3],4]
-explode(smallfish_number)
-print(f"{smallfish_number == [[[[0,9],2],3],4]}  {smallfish_number} == {[[[[0, 9], 2], 3], 4]}")
+# res = magnitude([9,1])
+# print(f"{res == 29} {res} == {29}")
+# res = magnitude([1,9])
+# print(f"{res == 21} {res} == {21}")
+# res = magnitude([[9,1],[1,9]])
+# print(f"{res == 129} {res} == {129}")
+# res = magnitude([[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]])
+# print(f"{res == 3488} {res} == {3488}")
+# smallfish_number = [[[[[9,8],1],2],3],4]
+# explode(smallfish_number)
+# print(f"{smallfish_number == [[[[0,9],2],3],4]}  {smallfish_number} == {[[[[0, 9], 2], 3], 4]}")
 
-smallfish_number = [7,[6,[5,[4,[3,2]]]]]
-explode(smallfish_number)
-print(f"{smallfish_number == [7,[6,[5,[7,0]]]]}")
+# smallfish_number = [7,[6,[5,[4,[3,2]]]]]
+# explode(smallfish_number)
+# print(f"{smallfish_number == [7,[6,[5,[7,0]]]]}")
 
-smallfish_number = [[6,[5,[4,[3,2]]]],1]
-explode(smallfish_number)
-print(f"{smallfish_number == [[6,[5,[7,0]]],3]} {smallfish_number} == [[6, [5, [7, 0]]], 3]")
+# smallfish_number = [[6,[5,[4,[3,2]]]],1]
+# explode(smallfish_number)
+# print(f"{smallfish_number == [[6,[5,[7,0]]],3]} {smallfish_number} == [[6, [5, [7, 0]]], 3]")
 
+# smallfish_number = [[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]
+# explode(smallfish_number)
+# print(f"{smallfish_number == [[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]}")
 
-smallfish_number = [[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]
-explode(smallfish_number)
-print(f"{smallfish_number == [[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]}")
+# smallfish_number = [[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]
+# explode(smallfish_number)
+# print(f"{smallfish_number == [[3,[2,[8,0]]],[9,[5,[7,0]]]]}")
 
-smallfish_number = [[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]
-explode(smallfish_number)
-print(f"{smallfish_number == [[3,[2,[8,0]]],[9,[5,[7,0]]]]}")
+# smallfish_number = [[[[0,7],4],[15,[0,13]]],[1,1]]
+# split(smallfish_number)
+# print(f"{smallfish_number == [[[[0,7],4],[[7,8],[0,13]]],[1,1]]} {smallfish_number} == {[[[[0,7],4],[[7,8],[0,13]]],[1,1]]}")
 
-smallfish_number = [[[[0,7],4],[15,[0,13]]],[1,1]]
-split(smallfish_number)
-print(f"{smallfish_number == [[[[0,7],4],[[7,8],[0,13]]],[1,1]]} {smallfish_number} == {[[[[0,7],4],[[7,8],[0,13]]],[1,1]]}")
-
-smallfish_number = [[[[0,7],4],[[7,8],[0,13]]],[1,1]]
-split(smallfish_number)
-print(f"{smallfish_number == [[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]} {smallfish_number} == {[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]}")
+# smallfish_number = [[[[0,7],4],[[7,8],[0,13]]],[1,1]]
+# split(smallfish_number)
+# print(f"{smallfish_number == [[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]} {smallfish_number} == {[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]}")
+# l1 = [[[[4,3],4],4],[7,[[8,4],9]]]
+# l2 = [1,1]
+# total = addition(l1, l2)
+# print(f"{total == [[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]}")
+# reduce(total)
+# print(f"{total == [[[[0,7],4],[[7,8],[6,0]]],[8,1]]}")
