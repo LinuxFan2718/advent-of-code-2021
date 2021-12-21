@@ -1,12 +1,3 @@
-filename = 'input18-test.txt'
-f = open(filename)
-snailfish_numbers = []
-while True:
-  line = f.readline().strip()
-  if line == '':
-    break
-  snailfish_numbers.append(eval(line))
-
 def explode(smallfish_number):
   # find leftmost pair nested inside four pairs
   nested_in_four = None
@@ -56,8 +47,13 @@ def explode(smallfish_number):
                     int_to_the_right = temp
                     stop_search = True
                     break
-                if isinstance(element, list):
-                  nested_in_four = temp
+                if not stop_search and isinstance(element, list):
+                  if nested_in_four == None:
+                    nested_in_four = temp
+                  else:
+                    int_to_the_right = {'i': i, 'j': j, 'k': k, 'm': m , 'n': 0}
+                    stop_search = True
+
 
   if nested_in_four == None:
     return False
@@ -82,7 +78,10 @@ def explode(smallfish_number):
       smallfish_number[i] += left
   # the pair's right value is added to the first regular number to the right of the exploding pair (if any)
   if int_to_the_right != None:
-    if 'm' in int_to_the_right:
+    if 'n' in int_to_the_right:
+      i, j, k, m = int_to_the_right['i'], int_to_the_right['j'], int_to_the_right['k'], int_to_the_right['m']
+      smallfish_number[i][j][k][m][0] += right      
+    elif 'm' in int_to_the_right:
       i, j, k, m = int_to_the_right['i'], int_to_the_right['j'], int_to_the_right['k'], int_to_the_right['m']
       smallfish_number[i][j][k][m] += right
     elif 'k' in int_to_the_right:
@@ -168,6 +167,29 @@ def reduce(smallfish_number):
     reduce(smallfish_number)
   return None
 
+# filename = 'input18-test2.txt'
+# f = open(filename)
+# snailfish_numbers = []
+# while True:
+#   line = f.readline().strip()
+#   if line == '':
+#     break
+#   snailfish_numbers.append(eval(line))
+snailfish_numbers = [
+  [1,1],
+  [2,2],
+  [3,3],
+  [4,4],
+  [5,5]
+]
+
+running_sum = snailfish_numbers[0]
+for x in range(1, len(snailfish_numbers)):
+  running_sum = addition(running_sum, snailfish_numbers[x])
+  reduce(running_sum)
+
+print(f"{running_sum}")
+
 # res = magnitude([9,1])
 # print(f"{res == 29} {res} == {29}")
 # res = magnitude([1,9])
@@ -181,7 +203,7 @@ def reduce(smallfish_number):
 # print(f"{smallfish_number == [[[[0,9],2],3],4]}  {smallfish_number} == {[[[[0, 9], 2], 3], 4]}")
 
 # smallfish_number = [7,[6,[5,[4,[3,2]]]]]
-# explode(smallfish_number)
+# reduce(smallfish_number)
 # print(f"{smallfish_number == [7,[6,[5,[7,0]]]]}")
 
 # smallfish_number = [[6,[5,[4,[3,2]]]],1]
@@ -209,3 +231,5 @@ def reduce(smallfish_number):
 # print(f"{total == [[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]}")
 # reduce(total)
 # print(f"{total == [[[[0,7],4],[[7,8],[6,0]]],[8,1]]}")
+
+
