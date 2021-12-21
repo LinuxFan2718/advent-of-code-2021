@@ -38,6 +38,8 @@ def explode(smallfish_number):
           smallfish_number[right_i[0]][right_i[1]][right_i[2]] += right
         elif len(right_i) == 4:
           smallfish_number[right_i[0]][right_i[1]][right_i[2]][right_i[3]] += right
+        elif len(right_i) == 5:
+          smallfish_number[right_i[0]][right_i[1]][right_i[2]][right_i[3]][right_i[4]] += right
       stop = True
   return stop
 
@@ -82,34 +84,91 @@ def addition(smallfish_number1, smallfish_number2):
 
   return ans
   
-def reduce(smallfish_number):
+def reduce(s_number):
+  smallfish_number = s_number[:]
   did_split = False
   did_explode = explode(smallfish_number)
   if not did_explode:
     did_split = split(smallfish_number)
   if did_explode or did_split:
     reduce(smallfish_number)
-  return None
+  return smallfish_number
 
-# filename = 'input18-test2.txt'
-# f = open(filename)
-# snailfish_numbers = []
-# while True:
-#   line = f.readline().strip()
-#   if line == '':
-#     break
-#   snailfish_numbers.append(eval(line))
+filename = 'input18.txt'
+f = open(filename)
+snailfish_numbers = []
+while True:
+  line = f.readline().strip()
+  if line == '':
+    break
+  snailfish_numbers.append(eval(line))
 # snailfish_numbers = [
-#   [[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],
-#   [7,[[[3,7],[4,3]],[[6,3],[8,8]]]],
-#   [[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]],
-#   [[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]],
-#   [7,[5,[[3,8],[1,4]]]],
-#   [[2,[2,2]],[8,[8,1]]],
-#   [2,9],
-#   [1,[[[9,3],9],[[9,0],[0,7]]]],
-#   [[[5,[7,4]],7],1],
-#   [[[[4,2],2],6],[8,7]]
+#   [[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]],
+#   [[[5,[2,8]],4],[5,[[9,9],0]]],
+#   [6,[[[6,2],[5,6]],[[7,6],[4,7]]]],
+#   [[[6,[0,7]],[0,9]],[4,[9,[9,0]]]],
+#   [[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]],
+#   [[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]],
+#   [[[[5,4],[7,7]],8],[[8,3],8]],
+#   [[9,3],[[9,9],[6,[4,9]]]],
+#   [[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]],
+#   [[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]
+# ]
+largest_magnitude = -1
+import itertools
+for tuple in list(itertools.permutations(range(len(snailfish_numbers)), r=2)):
+  filename = 'input18.txt'
+  f = open(filename)
+  snailfish_numbers = []
+  while True:
+    line = f.readline().strip()
+    if line == '':
+      break
+    snailfish_numbers.append(eval(line))
+  this_sum = None
+  this_sum = addition(snailfish_numbers[tuple[0]], snailfish_numbers[tuple[1]])
+  new_sum = reduce(this_sum)
+  this_magnitude = magnitude(new_sum)
+  if this_magnitude > largest_magnitude:
+    largest_magnitude = this_magnitude
+  if this_magnitude > 3993:
+    print(f"wrong {tuple}")
+
+print(f"largest magnitude = {largest_magnitude}. (example 3993)")
+print(f"{snailfish_numbers[6]}")
+print(f"{snailfish_numbers[0]}")
+this_sum = addition(snailfish_numbers[6], snailfish_numbers[0])
+reduce(this_sum)
+this_magnitude = magnitude(this_sum)
+print(this_magnitude)
+
+# snailfish_numbers = [
+  # [1,1],
+  # [2,2],
+  # [3,3],
+  # [4,4],
+  # [5,5],
+  # [6,6]
+  # [[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],
+  # [7,[[[3,7],[4,3]],[[6,3],[8,8]]]],
+  # [[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]],
+  # [[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]],
+  # [7,[5,[[3,8],[1,4]]]],
+  # [[2,[2,2]],[8,[8,1]]],
+  # [2,9],
+  # [1,[[[9,3],9],[[9,0],[0,7]]]],
+  # [[[5,[7,4]],7],1],
+  # [[[[4,2],2],6],[8,7]]
+  # [[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]],
+  # [[[5,[2,8]],4],[5,[[9,9],0]]],
+  # [6,[[[6,2],[5,6]],[[7,6],[4,7]]]],
+  # [[[6,[0,7]],[0,9]],[4,[9,[9,0]]]],
+  # [[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]],
+  # [[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]],
+  # [[[[5,4],[7,7]],8],[[8,3],8]],
+  # [[9,3],[[9,9],[6,[4,9]]]],
+  # [[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]],
+  # [[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]
 # ]
 
 # running_sum = snailfish_numbers[0]
@@ -120,7 +179,10 @@ def reduce(smallfish_number):
 #   reduce(running_sum)
 #   print(f"= {running_sum}")
 #   print()
-#   pass
+
+# ans = [[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]
+# print(f"{running_sum == ans}")
+# print(f"{magnitude(running_sum) == 4140}")
 
 # l1 = [[[[4, 0], [5, 4]], [[7, 7], [6, 0]]], [[8, [7, 7]], [[7, 9], [5, 0]]]]
 # l2 = [[2, [[0, 8], [3, 4]]], [[[6, 7], 1], [7, [1, 6]]]]
