@@ -1,99 +1,43 @@
+def list_numbers_in_order(l, current_i=[]):
+  idx = []
+  for i in range(len(l)):
+    if isinstance(l[i], int):
+      idx += [current_i + [i]]
+    elif isinstance(l[i], list):
+      this_i = current_i + [i]
+      idx += list_numbers_in_order(l[i], this_i)
+  return idx
+
 def explode(smallfish_number):
-  # find leftmost pair nested inside four pairs
-  nested_in_four = None
-  int_to_the_left = None
-  int_to_the_right = None
-  stop_search = False
-
-  # while iterating, keep track of
-  # int that you would add to
-  for i in range(len(smallfish_number)):
-    if not stop_search and isinstance(smallfish_number[i], int):
-      temp = {'i': i}
-      if nested_in_four == None:
-        int_to_the_left = temp
-      elif nested_in_four:
-        int_to_the_right = temp
-        stop_search = True
-        break
-    elif not stop_search and isinstance(smallfish_number[i], list):
-      for j in range(len(smallfish_number[i])):
-        if not stop_search and isinstance(smallfish_number[i][j], int):
-          temp = {'i': i, 'j': j}
-          if nested_in_four == None:
-            int_to_the_left = temp
-          elif nested_in_four:
-            int_to_the_right = temp
-            stop_search = True
-            break
-        elif not stop_search and isinstance(smallfish_number[i][j], list):
-          for k in range(len(smallfish_number[i][j])):
-            if not stop_search and isinstance(smallfish_number[i][j][k], int):
-              temp = {'i': i, 'j': j, 'k': k}
-              if nested_in_four == None:
-                int_to_the_left = temp
-              elif nested_in_four:
-                int_to_the_right = temp
-                stop_search = True
-                break
-            elif not stop_search and isinstance(smallfish_number[i][j][k], list):
-              for m in range(len(smallfish_number[i][j][k])):
-                element = smallfish_number[i][j][k][m]
-                temp = {'i': i, 'j': j, 'k': k, 'm': m }
-                if isinstance(element, int):
-                  if nested_in_four == None:
-                    int_to_the_left = temp
-                  elif nested_in_four:
-                    int_to_the_right = temp
-                    stop_search = True
-                    break
-                if not stop_search and isinstance(element, list):
-                  if nested_in_four == None:
-                    nested_in_four = temp
-                  else:
-                    int_to_the_right = {'i': i, 'j': j, 'k': k, 'm': m , 'n': 0}
-                    stop_search = True
-
-
-  if nested_in_four == None:
-    return False
-
-  # if there is one extract its values and change it to a 0 int
-  i, j, k, m = nested_in_four['i'], nested_in_four['j'], nested_in_four['k'], nested_in_four['m']
-  left, right = smallfish_number[i][j][k][m]
-  smallfish_number[i][j][k][m] = 0
-  # the pair's left value is added to the first regular number to the left of the exploding pair (if any)
-  if int_to_the_left != None:
-    if 'm' in int_to_the_left:
-      i, j, k, m = int_to_the_left['i'], int_to_the_left['j'], int_to_the_left['k'], int_to_the_left['m']
-      smallfish_number[i][j][k][m] += left
-    elif 'k' in int_to_the_left:
-      i, j, k = int_to_the_left['i'], int_to_the_left['j'], int_to_the_left['k']
-      smallfish_number[i][j][k] += left
-    elif 'j' in int_to_the_left:
-      i, j = int_to_the_left['i'], int_to_the_left['j']
-      smallfish_number[i][j] += left
-    elif 'i' in int_to_the_left:
-      i = int_to_the_left['i']
-      smallfish_number[i] += left
-  # the pair's right value is added to the first regular number to the right of the exploding pair (if any)
-  if int_to_the_right != None:
-    if 'n' in int_to_the_right:
-      i, j, k, m = int_to_the_right['i'], int_to_the_right['j'], int_to_the_right['k'], int_to_the_right['m']
-      smallfish_number[i][j][k][m][0] += right      
-    elif 'm' in int_to_the_right:
-      i, j, k, m = int_to_the_right['i'], int_to_the_right['j'], int_to_the_right['k'], int_to_the_right['m']
-      smallfish_number[i][j][k][m] += right
-    elif 'k' in int_to_the_right:
-      i, j, k = int_to_the_right['i'], int_to_the_right['j'], int_to_the_right['k']
-      smallfish_number[i][j][k] += right
-    elif 'j' in int_to_the_right:
-      i, j = int_to_the_right['i'], int_to_the_right['j']
-      smallfish_number[i][j] += right
-    elif 'i' in int_to_the_right:
-      i = int_to_the_right['i']
-      smallfish_number[i] += right
-  return True
+  idx = list_numbers_in_order(smallfish_number)
+  x = -1
+  while True:
+    x += 1
+    if len(idx[x]) == 5:
+      i, j, k, m = idx[x][0], idx[x][1], idx[x][2], idx[x][3]
+      left, right = smallfish_number[i][j][k][m]
+      smallfish_number[i][j][k][m] = 0
+      if x > 0:
+        left_i = idx[x - 1]
+        if len(left_i) == 1:
+          smallfish_number[left_i[0]] += left
+        elif len(left_i) == 2:
+          smallfish_number[left_i[0]][left_i[1]] += left
+        elif len(left_i) == 3:
+          smallfish_number[left_i[0]][left_i[1]][left_i[2]] += left
+        elif len(left_i) == 4:
+          smallfish_number[left_i[0]][left_i[1]][left_i[2]][left_i[3]] += left
+      if x + 2 < len(idx):
+        right_i = idx[x + 2]
+        if len(right_i) == 1:
+          smallfish_number[right_i[0]] += right
+        elif len(right_i) == 2:
+          smallfish_number[right_i[0]][right_i[1]] += right
+        elif len(right_i) == 3:
+          smallfish_number[right_i[0]][right_i[1]][right_i[2]] += right
+        elif len(right_i) == 4:
+          smallfish_number[right_i[0]][right_i[1]][right_i[2]][right_i[3]] += right
+      break
 
 def split(smallfish_number):
   stop = False
@@ -175,18 +119,18 @@ def reduce(smallfish_number):
 #   if line == '':
 #     break
 #   snailfish_numbers.append(eval(line))
-snailfish_numbers = [
-  [[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],
-  [7,[[[3,7],[4,3]],[[6,3],[8,8]]]],
-  [[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]],
-  [[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]],
-  [7,[5,[[3,8],[1,4]]]],
-  [[2,[2,2]],[8,[8,1]]],
-  [2,9],
-  [1,[[[9,3],9],[[9,0],[0,7]]]],
-  [[[5,[7,4]],7],1],
-  [[[[4,2],2],6],[8,7]]
-]
+# snailfish_numbers = [
+#   [[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],
+#   [7,[[[3,7],[4,3]],[[6,3],[8,8]]]],
+#   [[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]],
+#   [[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]],
+#   [7,[5,[[3,8],[1,4]]]],
+#   [[2,[2,2]],[8,[8,1]]],
+#   [2,9],
+#   [1,[[[9,3],9],[[9,0],[0,7]]]],
+#   [[[5,[7,4]],7],1],
+#   [[[[4,2],2],6],[8,7]]
+# ]
 
 # running_sum = snailfish_numbers[0]
 # for x in range(1, len(snailfish_numbers)):
