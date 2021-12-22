@@ -19,4 +19,19 @@ while True:
     x,y,z = [int(n) for n in line.split(',')]
     scanners[scanner_num].append([x,y,z])
 
+# compute distance from each other
+distances = []
+for x in range(len(scanners)):
+  scanner = scanners[x]
+  distances.append([None] * len(scanner))
+  for i in range(len(scanner)):
+    distances[x][i] = [None] * len(scanner)
+    for j in range(len(scanner)):
+      x1, y1, z1 = scanner[i]
+      x2, y2, z2 = scanner[j]
+      dist_squared = (x1 - x2)**2 + (y1 - y2)**2 + (z1 - z2)**2 
+      distances[x][i][j] = dist_squared
 pass
+
+
+# look for identical distances
