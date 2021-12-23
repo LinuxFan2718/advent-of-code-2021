@@ -1,3 +1,4 @@
+DEBUG = True
 filename = 'input20-test.txt'
 f = open(filename)
 lookup = ''
@@ -14,9 +15,10 @@ while True:
     break
   image.append(list(line))
 
+
 iterations = 2
+grow = 6
 for _ in range(iterations):
-  grow = 2
   width = len(image[0])
   height = len(image)
   for i in range(height):
@@ -26,6 +28,11 @@ for _ in range(iterations):
     image.insert(0, ['.'] * (width+2*grow))
   for _ in range(grow):
     image.append(['.'] * (width+2*grow))
+
+  if False:
+    for row in image:
+      print(''.join(row))
+    print()
 
   new_image = []
   for row in image:
@@ -40,10 +47,23 @@ for _ in range(iterations):
         if raw_num[k] == '#':
           num +=1
       new_image[i][j] = lookup[num]
-  image = new_image
+  image = []
+  for row in new_image:
+    image.append(row[:])
+
+
+# trim edge
+trimmed_image = []
+for i in range(grow + 2, len(image) - grow - 2):
+  trimmed_image.append(image[i][grow+2:-grow-2])
 
 num_lit_pixels = 0
-for row in image:
+for row in trimmed_image:
   num_lit_pixels += row.count('#')
+
+if DEBUG:
+  for row in trimmed_image:
+    print(''.join(row))
+  print()
 
 print(num_lit_pixels)
