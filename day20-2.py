@@ -1,5 +1,5 @@
 DEBUG = True
-filename = 'input20-test.txt'
+filename = 'input20.txt'
 f = open(filename)
 lookup = ''
 while True:
@@ -15,21 +15,21 @@ while True:
     break
   image.append(list(line))
 
-iterations = 2
-grow = 1
+iterations = 50
+grow = 100
+width = len(image[0])
+height = len(image)
+for i in range(height):
+  image[i] = ['.'] * grow + image[i] + ['.'] * grow
+
+for _ in range(grow):
+  image.insert(0, ['.'] * (width+2*grow))
+for _ in range(grow):
+  image.append(['.'] * (width+2*grow))
+
 for iteration in range(iterations):
   if iteration % 10 == 0:
     print(iteration)
-  width = len(image[0])
-  height = len(image)
-  for i in range(height):
-    image[i] = ['.'] * grow + image[i] + ['.'] * grow
-
-  for _ in range(grow):
-    image.insert(0, ['.'] * (width+2*grow))
-  for _ in range(grow):
-    image.append(['.'] * (width+2*grow))
-
   new_image = []
   for row in image:
     new_image.append(row[:])
@@ -64,13 +64,12 @@ for iteration in range(iterations):
   for row in new_image:
     image.append(row[:])
 
-
 num_lit_pixels = 0
-for row in image:
-  num_lit_pixels += row.count('#')
+for i in range(48, len(image) - 32):
+  row = image[i]
+  trim_row = row[1:]
+  num_lit_pixels += trim_row.count('#')
+  print(''.join(trim_row))
+print()
 
-if DEBUG:
-  for row in image:
-    print(''.join(row))
-  print()
 print(num_lit_pixels)
