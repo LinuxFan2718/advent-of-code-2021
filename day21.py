@@ -1,11 +1,12 @@
+import math
 winning_score = 21
-position = [4, 8]
+position = [7, 6]
 score = [0, 0]
 game = {
   "position": position,
   "score": score,
   "player": 0,
-  "occurances": 1
+  "universes": 1
 }
 wins = [0 ,0]
 games = [game]
@@ -20,11 +21,17 @@ rolls = {
 }
 
 while len(games) > 0:
+  print(f"wins {sum(wins)} games {len(games)}")
   new_games = []
   for game in games:
-    player = game["player"]
     for roll in rolls:
-      new_game = game.copy()
+      new_game = {
+        "position": game["position"][:],
+        "score": game["score"][:],
+        "player": game["player"],
+        "universes": game["universes"]
+      }
+      player = new_game["player"]
       num_occurances = rolls[roll]
       current_position = new_game["position"][player]
       current_position += roll
@@ -34,10 +41,10 @@ while len(games) > 0:
       new_game["position"][player] = current_position
       new_game["score"][player] += current_position
       new_game["player"] = (player + 1) % 2
-      new_game["occurances"] *= num_occurances
+      new_game["universes"] *= num_occurances
 
       if new_game["score"][player] >= winning_score:
-        wins[player] += new_game["occurances"]
+        wins[player] += new_game["universes"]
       else:
         new_games.append(new_game)
   games = new_games
